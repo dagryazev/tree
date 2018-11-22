@@ -23,7 +23,8 @@ export default {
       this.$store.commit( 'postBlock', parseInt( Math.random() * 1000 ) );
     },
     getTree: function() {
-      return this.$store.getters.renderTree();
+      console.log(this.$store.getters.getPathChild);
+      return this.$store.getters.getPathChild;
     }
   }
 }

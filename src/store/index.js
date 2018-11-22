@@ -44,12 +44,19 @@ const store = new Vuex.Store({
     renderTree: state => value => {
       let result = [],
           bool = false,
-          arr = JSON.parse( JSON.stringify( state.blocks ) );
+          arr = JSON.parse( JSON.stringify( value == false ? state.blocks : value ) );
+
+      function findArray(id){
+        for( let item of arr ){
+          if( item.id == id )return item;
+        }
+      }
+      
       for( let item of arr ){
         if (item.parent == null) {
           result.push(item);
         } else {
-          let parent = arr[item.parent - 1];
+          let parent = findArray(item.parent);
           if (!parent.children) parent.children = [];
           parent.children.push(item);
         }
@@ -66,6 +73,34 @@ const store = new Vuex.Store({
       if(bool === false)
         return(result[0]);
       else return {id: 1, value: "Нету соответсвий"};
+    },
+    getPathChild: state => {
+      if( state.stringSearch == '') return store.getters.renderTree(false);
+      let result = [],
+          index = 0,
+          arr = JSON.parse( JSON.stringify( state.blocks ) );
+          for( let item of arr ){
+            if( item.value == state.stringSearch ) result.push(item);
+          }
+
+          function findParent(id){
+            for( let item of arr ){
+              if( id == null) return false;
+              if( id == item.id ){
+                result.push( item )
+                findParent(item.parent)
+                // item.parent = result.length - 1;
+              }
+            }
+          }
+
+          console.log(result.length);
+          if(result.length == 0)
+            return store.getters.renderTree(false);
+          else{
+            findParent(result[0].parent)
+            return store.getters.renderTree(result.reverse())
+          }
     }
   },
   mutations: {
